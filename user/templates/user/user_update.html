@@ -1,12 +1,15 @@
-<!-- user/templates/user/user_update.html -->
-
-{% extends "base_generic.html" %}
+{% extends "base.html" %}
 
 {% block content %}
-  <h2>Update Profile</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Update</button>
-  </form>
+    <h2>Update Profile</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Changes</button>
+    </form>
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
 {% endblock %}

@@ -6,7 +6,14 @@
     <title>{% block title %}Title{% endblock %}</title>
 </head>
 <body>
-    <header><h2>Header</h2></header>
+    <header>
+        <h2>Header</h2>
+        <nav>
+            <a href="{% url 'user_registration' %}">Register</a>
+            <a href="{% url 'user_profile' %}">Profile</a>
+        </nav>
+
+    </header>
     <main>
         {% block content %}
 

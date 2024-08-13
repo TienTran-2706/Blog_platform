@@ -31,7 +31,7 @@ THIRD_PARTY_APPS = [
 
 ]
 USER_DEFINED_APPS = [
-    'user'
+    'user',
 ]
 
 INSTALLED_APPS = BUILT_IN_APPS + THIRD_PARTY_APPS + USER_DEFINED_APPS
@@ -51,7 +51,7 @@ ROOT_URLCONF = 'blog_platform.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -142,3 +142,6 @@ EMAIL_USE_TLS = env('EMAIL_USE_TLS') == 'True'
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
+
+
+AUTH_USER_MODEL = 'user.User'

@@ -6,10 +6,10 @@ class UserRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["username", "email", "password", "profile_picture", "bio"]
+        fields = ['username', 'email', 'password', 'profile_picture', 'bio']
 
 
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["username", "email", "profile_picture", "bio"]
+        fields = ['username', 'email', 'profile_picture', 'bio']
