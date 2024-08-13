@@ -1,0 +1,9 @@
+<!-- user/templates/user/user_profile.html -->
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h2>{{ user.username }}'s Profile</h2>
+  <img src="{{ user.profile_picture }}" alt="{{ user.username }}" />
+  <p>{{ user.bio }}</p>
+{% endblock %}
