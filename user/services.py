@@ -10,6 +10,7 @@ from charset_normalizer import from_bytes
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from blog_platform import settings
+from django.utils.encoding import force_bytes, force_str
 from user.models import User
 
 logger = logging.getLogger(__name__)
@@ -27,11 +28,6 @@ class EmailService:
     """
     @staticmethod
     def send_confirmation_email(user):
-        """
-        Sends an email confirmation to the specified user.
-        Args:
-            user (User): The user to send the email confirmation to.
-        """
         try:
             # Generate a secure random token
             token = get_random_string(length=32)
@@ -49,13 +45,13 @@ class EmailService:
             # Generate the email confirmation link
             protocol = current_site.scheme or 'http'
             domain = current_site.domain
-            uid = urlsafe_base64_encode(from_bytes(user.pk)).decode()
-            token_url = f'{protocol}://{domain}{reverse("user:confirm-email", args=[uid, token])}'
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token_url = f'{protocol}://{domain}{reverse("user:confirm_email", args=[uid, token])}'
 
             # Send the email
             subject = 'Confirm your email address'
             message = render_to_string(
-                'user/confirmation_email.html', {
+                'user/confirm_email.html', {
                     'user': user,
                     'domain': domain,
                     'token': token,
@@ -75,44 +71,25 @@ class EmailService:
             except Exception as e:
                 logger.error(f"Failed to send email confirmation to {user.email}: {e}")
                 return
-
-            # Log the email sending result
-            logger.info(f"Email confirmation sent to {user.email}")
-
         except Exception as e:
             logger.error(f"An error occurred while sending email confirmation: {e}")
 
     @staticmethod
     def confirm_email(token, uid):
-        """
-        Confirms the email address of the user with the specified token and user ID.
-
-        Args:
-            token (str): The email confirmation token.
-            uid (str): The user ID.
-        """
         try:
-            # Validate the token
-            try:
-                user = User.objects.get(pk=urlsafe_base64_decode(uid).decode())
-            except ObjectDoesNotExist:
-                logger.error(f"Invalid user ID: {uid}")
-                return
-
-            if user.email_confirmation_token != token:
-                logger.error(f"Invalid email confirmation token for {uid}")
-                return
-
-            # Validate the token expiration
-            if timezone.now() > user.email_confirmation_token_expires:
-                logger.error(f"Email confirmation token has expired for {uid}")
-                return
-
-            # Confirm the email address
-            user.email_confirmed = True
-            user.save()
-
-            logger.info(f"Email confirmed for {user.email}")
-
-        except Exception as e:
-            logger.error(f"An error occurred while confirming email: {e}")
+            # Decode the token
+            uid = force_str(urlsafe_base64_decode(uid))
+            # Get the user by the decoded UID
+            user = User.objects.get(pk=uid)
+            # Confirm the user
+            if user.email_confirmation_token == token and user.email_confirmation_token_expires > timezone.now():
+                # Confirm the user
+                user.is_email_confirmed = True
+                # Clear the token
+                user.email_confirmation_token = None
+                user.email_confirmation_token_expires = None
+                user.save()
+                return True
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            # Handle errors, such as invalid token or user not found
+            return False

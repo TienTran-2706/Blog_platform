@@ -58,6 +58,7 @@ class User(BaseModel, AbstractBaseUser):
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
+        db_table = 'user'
 
 
     def generate_confirmation_token(self):

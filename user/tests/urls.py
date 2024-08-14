@@ -4,13 +4,13 @@ from user.views import RegistrationView, LoginView, LogoutView, ProfileView, Upd
 app_name = 'user'
 
 urlpatterns = [
-    path('register/', RegistrationView.as_view(), name='register'),
+    path('register/', RegistrationView.as_view(), name='registration'),
     path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view(), name='logout'),
 
     path('profile/', ProfileView.as_view(), name='profile'),
     path('update-profile/', UpdateProfileView.as_view(), name='update'),
-    path('confirm-email/<str:uid>/<str:token>/', EmailConfirmationView.as_view(), name='confirm_email'),
+    path('confirm-email/<str:token>/', EmailConfirmationView.as_view(), name='confirm_email'),
     path('email-confirmed/', EmailConfirmedView.as_view(), name='email_confirmed'),
     path('invalid-token/', EmailConfirmationView.as_view(), name='invalid_token'),
 

@@ -55,7 +55,7 @@ class RegistrationView(View):
         try:
             form = RegistrationForm()
             logger.info('User registration from rendered')
-            return render(request, 'user/registration.html', {'form': form})
+            return render(request, 'user/register.html', {'form': form})
         except Exception as e:
             # Handle unexpected error
             logger.error(f"An error occurred: {e}")
@@ -77,8 +77,8 @@ class RegistrationView(View):
                     user.is_active = False
                     user.save()
                     EmailService.send_confirmation_email(user)
-                    return redirect('user:confirm-email')
-                return render(request, 'user/registration.html', {'form': form})
+                    return redirect('user:confirm_email')
+                return render(request, 'user/register.html', {'form': form})
             except IntegrityError as e:
                 logger.error(f"IntegrityError occurred: {e}")
                 return custom_error_handler(request, e)
@@ -114,7 +114,7 @@ class LoginView(View):
                 user = authenticate(request, username=username, password=password)
                 if user is not None:
                     login(request, user)
-                    return redirect('profile')
+                    return redirect('user:profile')
                 else:
                     form.add_error(None, 'Invalid username or password')
             return render(request, 'user/login.html', {'form': form})
@@ -250,20 +250,20 @@ class EmailConfirmationView(View):
     Methods:
         get(self, request, token): Handles the GET request and confirms the user's email address.
     """
-    def get(self, request, token):
+    def get(self, request, uid, token):
         try:
             # Decode the token
-            uid = force_str(urlsafe_base64_decode(token))
+            uid = force_str(urlsafe_base64_decode(uid))
             # Get the user by the decoded UID
-            user = User.objects.get(email_confirmation_token=uid)
+            user = User.objects.get(pk =uid, email_confirmation_token=token)
             # Confirm the user
             user.is_email_confirmed = True
             user.email_confirmation_token = None  # Clear the token
             user.save()
-            return redirect('email_confirmed')
+            return redirect('user:email_confirmed')
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             # Handle errors, such as invalid token or user not found
-            return redirect('invalid_token')
+            return redirect('user:invalid_token')
 
 
 class EmailConfirmedView(View):

@@ -8,5 +8,5 @@
     {% if user.profile_picture %}
         <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
     {% endif %}
-    <a href="{% url 'update' %}">Edit Profile</a>
+    <a href="{% url 'user:update' %}">Edit Profile</a>
 {% endblock %}
