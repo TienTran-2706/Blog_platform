@@ -31,6 +31,7 @@ THIRD_PARTY_APPS = [
 
 ]
 USER_DEFINED_APPS = [
+    'core',
     'user',
 ]
 

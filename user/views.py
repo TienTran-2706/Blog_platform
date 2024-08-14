@@ -47,7 +47,7 @@ class UserRegistrationView(View):
         try:
             form = UserRegistrationForm()
             logger.info('User registration from rendered')
-            return render(request, 'user/user_register.html', {'form': form})
+            return render(request, 'user/user_registration.html', {'form': form})
         except Exception as e:
             # Handle unexpected error
             logger.error(f"An error occurred: {e}")
@@ -70,7 +70,7 @@ class UserRegistrationView(View):
                     user.save()
                     EmailService.send_confirmation_email(user)
                     return redirect('user:confirm-email')
-                return render(request, 'user/user_register.html', {'form': form})
+                return render(request, 'user/user_registration.html', {'form': form})
             except IntegrityError as e:
                 logger.error(f"IntegrityError occurred: {e}")
                 return custom_error_handler(request, e)
@@ -99,7 +99,7 @@ class UserProfileView(LoginRequiredMixin, DetailView):
     model = User
     template_name='user/user_profile.html'
     context_object_name = 'user'
-
+    
     def get_object(self, queryset=None):
         """
         Ensures that users can only see their own profile.
