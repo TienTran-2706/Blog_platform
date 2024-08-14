@@ -28,7 +28,7 @@ BUILT_IN_APPS = [
     'django.contrib.staticfiles',
 ]
 THIRD_PARTY_APPS = [
-
+    'django_extensions',
 ]
 USER_DEFINED_APPS = [
     'core',
