@@ -6,6 +6,7 @@ from django.views.generic import  UpdateView, DetailView
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.urls import reverse_lazy, reverse
 
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
@@ -61,30 +62,30 @@ class RegistrationView(View):
             logger.error(f"An error occurred: {e}")
             return custom_error_handler(request, e)
     def post(self, request):
-            """
-            Handles POST requests and creates a new user if the form data is valid.
+        try:
+            form = RegistrationForm(request.POST)
+            if form.is_valid():
+                user = form.save(commit=False)
+                user.is_active = False
+                user.save()
 
-            Args:
-                request (HttpRequest): The incoming request object.
+                # Debug log
+                logger.info(f"User created with username: {user.username}")
 
-            Returns:
-                HttpResponse: A response object with a redirect to the confirmation page if the user is created successfully.
-            """
-            try:
-                form = RegistrationForm(request.POST)
-                if form.is_valid():
-                    user = form.save(commit=False)
-                    user.is_active = False
-                    user.save()
-                    EmailService.send_confirmation_email(user)
-                    return redirect('user:confirm_email')
-                return render(request, 'user/register.html', {'form': form})
-            except IntegrityError as e:
-                logger.error(f"IntegrityError occurred: {e}")
-                return custom_error_handler(request, e)
-            except Exception as e:
-                logger.error(f"An error occurred: {e}")
-                return custom_error_handler(request, e)
+                result = EmailService.send_confirmation_email(user)
+                logger.info(f"Email sent with result: {result}")
+
+                # Redirect to confirmation email view
+                return redirect(reverse('user:confirm_email', kwargs={'uid': result['uid'], 'token': result['token']}))
+            return render(request, 'user/register.html', {'form': form})
+
+        except IntegrityError as e:
+            logger.error(f"IntegrityError occurred: {e}")
+            return custom_error_handler(request, e)
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
+            return custom_error_handler(request, e)
+
 
 
 class LoginView(View):
